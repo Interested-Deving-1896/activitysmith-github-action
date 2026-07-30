@@ -316,7 +316,14 @@ test("reports configuration failures without failing the workflow by default", a
         "api-key": "test-api-key",
         action: "update_app_icon_badge_count",
       },
-      message: "An app icon badge payload must be provided",
+      message: "A payload or payload file path must be provided",
+    },
+    {
+      inputs: {
+        "api-key": "test-api-key",
+        action: "send_push_notification",
+      },
+      message: "A payload or payload file path must be provided",
     },
   ];
 

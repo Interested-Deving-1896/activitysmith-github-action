@@ -28,4 +28,5 @@ test("package and lockfile versions match", () => {
   assert.match(packageJson.version, /^\d+\.\d+\.\d+$/);
   assert.equal(packageLock.version, packageJson.version);
   assert.equal(packageLock.packages[""].version, packageJson.version);
+  assert.equal(packageJson.dependencies["@actions/github"], undefined);
 });

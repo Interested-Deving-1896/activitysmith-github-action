@@ -1,6 +1,5 @@
 import fs from "node:fs";
 import path from "node:path";
-import * as github from "@actions/github";
 import { flatten } from "flat";
 import yaml from "js-yaml";
 import ActivitySmithError from "./errors.js";
@@ -31,9 +30,10 @@ export default class Content {
         this.values = undefined;
         break;
       default:
-        config.core.debug("Missing payload so gathering inputs from action context.");
-        this.values = github.context;
-        break;
+        throw new ActivitySmithError(
+          config.core,
+          "Missing input! A payload or payload file path must be provided."
+        );
     }
     if (config.inputs.liveActivityId && this.values && typeof this.values === "object") {
       this.values.activity_id = config.inputs.liveActivityId;

@@ -376,7 +376,7 @@ Show a number on the ActivitySmith app icon. Send `0` to clear it, and optionall
 
 - `action` (required): `send_push_notification`, `stream_live_activity`, `end_live_activity_stream`, `start_live_activity`, `update_live_activity`, `end_live_activity`, `update_metric_value`, or `update_app_icon_badge_count`
 - `api-key` (required): ActivitySmith API key
-- `payload` (optional): inline JSON or YAML payload. The current ActivitySmith API payload is passed through, including notification tags; `stats`, `metrics`, `segmented_progress`, `progress`, `alert`, and `timer` Live Activities; widget metric values; and app icon badge counts. For `end_live_activity_stream`, `payload` is optional.
+- `payload` (required except for `end_live_activity_stream`): inline JSON or YAML payload. The current ActivitySmith API payload is passed through, including notification tags; `stats`, `metrics`, `segmented_progress`, `progress`, `alert`, and `timer` Live Activities; widget metric values; and app icon badge counts.
 - `payload-file-path` (optional): path to a `.json`, `.yml`, or `.yaml` payload file
 - `live-activity-id` (required for `update_live_activity` and `end_live_activity`): Live Activity ID
 - `stream-key` (required for `stream_live_activity` and `end_live_activity_stream`): stable key used to identify the tracked stream

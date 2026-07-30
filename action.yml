@@ -23,7 +23,7 @@ inputs:
     description: "Metric key for update_metric_value."
     required: false
   payload:
-    description: "Request body content using JSON or YAML. Supports the current ActivitySmith API payload, including notification tags; stats, metrics, segmented_progress, progress, alert, and timer Live Activities; widget metric values; and app icon badge counts. For end_live_activity_stream, payload is optional."
+    description: "Request body content using JSON or YAML. Required unless action is end_live_activity_stream. Supports the current ActivitySmith API payload, including notification tags; stats, metrics, segmented_progress, progress, alert, and timer Live Activities; widget metric values; and app icon badge counts."
     required: false
   channels:
     description: "Optional comma-separated channel names to target for send_push_notification, stream_live_activity, start_live_activity, and update_app_icon_badge_count."

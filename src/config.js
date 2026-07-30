@@ -63,10 +63,11 @@ export default class Config {
   constructor(core) {
     this.core = core;
     this.logger = new Logger(core).logger;
+    const errors = core.getInput("errors");
     this.inputs = {
       action: core.getInput("action"),
       apiKey: core.getInput("api-key"),
-      errors: core.getBooleanInput("errors"),
+      errors: errors ? core.getBooleanInput("errors") : false,
       liveActivityId: core.getInput("live-activity-id"),
       streamKey: core.getInput("stream-key"),
       metricKey: core.getInput("metric-key"),
@@ -122,17 +123,20 @@ export default class Config {
         if (!this.inputs.metricKey) {
           throw new ActivitySmithError(core, "Missing input! A metric key must be provided.");
         }
-        if (!this.inputs.payload && !this.inputs.payloadFilePath) {
-          throw new ActivitySmithError(core, "Missing input! A metric value payload must be provided.");
-        }
-        break;
-      case ActionType.UpdateAppIconBadgeCount:
-        if (!this.inputs.payload && !this.inputs.payloadFilePath) {
-          throw new ActivitySmithError(core, "Missing input! An app icon badge payload must be provided.");
-        }
         break;
       default:
         break;
+    }
+
+    if (
+      this.inputs.action !== ActionType.EndLiveActivityStream &&
+      !this.inputs.payload &&
+      !this.inputs.payloadFilePath
+    ) {
+      throw new ActivitySmithError(
+        core,
+        "Missing input! A payload or payload file path must be provided."
+      );
     }
   }
 
