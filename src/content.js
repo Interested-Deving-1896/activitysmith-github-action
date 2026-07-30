@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import github from "@actions/github";
+import * as github from "@actions/github";
 import { flatten } from "flat";
 import yaml from "js-yaml";
 import ActivitySmithError from "./errors.js";
@@ -66,8 +66,6 @@ export default class Content {
           schema: yaml.JSON_SCHEMA,
         })
       );
-
-      content.activity_id = config.inputs.liveActivityId;
 
       return /** @type {Content} */ (content);
     } catch (error) {

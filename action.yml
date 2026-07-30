@@ -1,10 +1,10 @@
 name: ActivitySmith.com
 author: "ActivitySmithHQ"
-description: "Send push notifications with optional rich media and actions, and trigger stateless or manual Live Activity workflows directly from your GitHub workflows"
+description: "Send push notifications, drive Live Activities, update widget metrics, and set app icon badge counts directly from GitHub workflows"
 
 inputs:
   action:
-    description: "Choose the action to perform: send_push_notification, stream_live_activity, end_live_activity_stream, start_live_activity, update_live_activity, or end_live_activity."
+    description: "Choose the action to perform: send_push_notification, stream_live_activity, end_live_activity_stream, start_live_activity, update_live_activity, end_live_activity, update_metric_value, or update_app_icon_badge_count."
     required: true
   api-key:
     description: "The authentication value used with the ActivitySmith API."
@@ -19,11 +19,14 @@ inputs:
   stream-key:
     description: "Stable stream key for stream_live_activity and end_live_activity_stream."
     required: false
+  metric-key:
+    description: "Metric key for update_metric_value."
+    required: false
   payload:
-    description: "Request body content using JSON or YAML. Push notifications support media, redirection, and actions. Live Activities support metrics, segmented_progress, and progress payloads plus one optional action button. For end_live_activity_stream, payload is optional."
+    description: "Request body content using JSON or YAML. Supports the current ActivitySmith API payload, including notification tags; stats, metrics, segmented_progress, progress, alert, and timer Live Activities; widget metric values; and app icon badge counts. For end_live_activity_stream, payload is optional."
     required: false
   channels:
-    description: "Optional comma-separated channel names to target for send_push_notification, stream_live_activity, and start_live_activity."
+    description: "Optional comma-separated channel names to target for send_push_notification, stream_live_activity, start_live_activity, and update_app_icon_badge_count."
     required: false
   payload-delimiter:
     description: "Field separator for nested attributes in the input payload."
@@ -45,7 +48,7 @@ outputs:
     description: "The operation returned by stream actions, such as started, updated, rotated, noop, paused, or ended."
 
 runs:
-  using: node20
+  using: node24
   main: dist/index.js
 
 branding:

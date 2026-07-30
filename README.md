@@ -22,6 +22,9 @@ Live Activity UI types:
 - `segmented_progress`: best for step-based workflows like deployments, backups, and ETL pipelines
 - `progress`: best for continuous jobs like uploads, reindexes, and long-running migrations tracked as a percentage
 - `metrics`: best for live operational stats like server CPU and memory, queue depth, or replica lag
+- `stats`: best for a compact grid of business or operational values
+- `alert`: best for an important state with a message and optional actions
+- `timer`: best for countdowns or elapsed-time tracking
 
 ### Recommended for GitHub Actions: Full lifecycle control
 
@@ -90,7 +93,7 @@ Activity to mirror the workflow step by step.
         type: "segmented_progress"
         number_of_steps: 3
         current_step: 3
-        auto_dismiss_minutes: 2
+        auto_dismiss_seconds: 10
 ```
 
 ### Other lifecycle patterns
@@ -339,15 +342,46 @@ Add redirection when tapping the notification should open a specific URL, and us
             severity: "high"
 ```
 
+## Widget Metrics
+
+Update a metric used by ActivitySmith widgets. `value` can be a number or a string, and `timestamp` is optional.
+
+```yaml
+- name: Update deployment count
+  uses: ActivitySmithHQ/activitysmith-github-action@v1
+  with:
+    action: update_metric_value
+    api-key: ${{ secrets.ACTIVITYSMITH_API_KEY }}
+    metric-key: deployments-today
+    payload: |
+      value: 42
+```
+
+## App Icon Badge Count
+
+Show a number on the ActivitySmith app icon. Send `0` to clear it, and optionally target channels.
+
+```yaml
+- name: Update app icon badge
+  uses: ActivitySmithHQ/activitysmith-github-action@v1
+  with:
+    action: update_app_icon_badge_count
+    api-key: ${{ secrets.ACTIVITYSMITH_API_KEY }}
+    channels: ops
+    payload: |
+      badge: 3
+```
+
 ## Inputs
 
-- `action` (required): `send_push_notification`, `stream_live_activity`, `end_live_activity_stream`, `start_live_activity`, `update_live_activity`, or `end_live_activity`
+- `action` (required): `send_push_notification`, `stream_live_activity`, `end_live_activity_stream`, `start_live_activity`, `update_live_activity`, `end_live_activity`, `update_metric_value`, or `update_app_icon_badge_count`
 - `api-key` (required): ActivitySmith API key
-- `payload` (optional): inline JSON or YAML payload. Push notifications support optional `media`, `redirection`, and up to 4 `actions`. Live Activities support `metrics`, `segmented_progress`, or `progress` `content_state` plus one optional `action`. For `end_live_activity_stream`, `payload` is optional.
+- `payload` (optional): inline JSON or YAML payload. The current ActivitySmith API payload is passed through, including notification tags; `stats`, `metrics`, `segmented_progress`, `progress`, `alert`, and `timer` Live Activities; widget metric values; and app icon badge counts. For `end_live_activity_stream`, `payload` is optional.
 - `payload-file-path` (optional): path to a `.json`, `.yml`, or `.yaml` payload file
 - `live-activity-id` (required for `update_live_activity` and `end_live_activity`): Live Activity ID
 - `stream-key` (required for `stream_live_activity` and `end_live_activity_stream`): stable key used to identify the tracked stream
-- `channels` (optional): comma-separated channels for `send_push_notification`, `stream_live_activity`, and `start_live_activity`
+- `metric-key` (required for `update_metric_value`): widget metric key
+- `channels` (optional): comma-separated channels for `send_push_notification`, `stream_live_activity`, `start_live_activity`, and `update_app_icon_badge_count`
 - `errors` (optional, default `false`): set to `true` to fail the step when the API request fails
 - `payload-delimiter` (optional): advanced override for nested payload flattening
 

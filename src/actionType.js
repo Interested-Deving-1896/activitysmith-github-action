@@ -5,4 +5,6 @@ export const ActionType = {
   UpdateLiveActivity: "update_live_activity",
   EndLiveActivity: "end_live_activity",
   EndLiveActivityStream: "end_live_activity_stream",
+  UpdateMetricValue: "update_metric_value",
+  UpdateAppIconBadgeCount: "update_app_icon_badge_count",
 };

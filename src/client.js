@@ -57,6 +57,24 @@ export default class Client {
   }
 
   /**
+   * Require an object payload for operations whose request body cannot fall back
+   * to GitHub context.
+   * @param {unknown} payload
+   * @param {Config} config
+   * @param {string} operation
+   * @returns {Record<string, unknown>}
+   */
+  requireObjectPayload(payload, config, operation) {
+    if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
+      throw new ActivitySmithError(
+        config.core,
+        `Invalid payload! ${operation} requires an object payload.`
+      );
+    }
+    return /** @type {Record<string, unknown>} */ (payload);
+  }
+
+  /**
    * Perform the API call configured with the input payload.
    * @param {Config} config
    */
@@ -105,6 +123,53 @@ export default class Client {
             liveActivityStreamDeleteRequest: config.content.values,
           });
           break;
+        case ActionType.UpdateMetricValue: {
+          config.logger.info("Making ActivitySmith widget metric update request...");
+          const payload = this.requireObjectPayload(
+            config.content.values,
+            config,
+            ActionType.UpdateMetricValue
+          );
+          if (!Object.hasOwn(payload, "value")) {
+            throw new ActivitySmithError(
+              config.core,
+              "Invalid payload! update_metric_value requires a value."
+            );
+          }
+          response = await client.metrics.updateMetricValueRaw({
+            key: config.inputs.metricKey,
+            metricValueUpdateRequest: payload,
+          });
+          break;
+        }
+        case ActionType.UpdateAppIconBadgeCount: {
+          config.logger.info("Making ActivitySmith app icon badge count request...");
+          const payload = this.requireObjectPayload(
+            this.withChannels(config.content.values, config.inputs.channels),
+            config,
+            ActionType.UpdateAppIconBadgeCount
+          );
+          if (
+            !Number.isInteger(payload.badge) ||
+            /** @type {number} */ (payload.badge) < 0
+          ) {
+            throw new ActivitySmithError(
+              config.core,
+              "Invalid payload! update_app_icon_badge_count requires a non-negative integer badge."
+            );
+          }
+          const { badge, ...options } = payload;
+          const data = await client.badgeCount(
+            /** @type {number} */ (badge),
+            options
+          );
+          config.logger.info("✅ Success! - 200");
+          config.logger.info(`Response: ${JSON.stringify(data)}`);
+          config.core.setOutput("ok", true);
+          config.core.setOutput("response", JSON.stringify(data));
+          config.core.debug(JSON.stringify(data));
+          return;
+        }
         default:
           break;
       }

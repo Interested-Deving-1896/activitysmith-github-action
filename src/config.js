@@ -1,4 +1,3 @@
-import core from "@actions/core";
 import Content from "./content.js";
 import ActivitySmithError from "./errors.js";
 import { ActionType } from "./actionType.js";
@@ -17,6 +16,7 @@ export default class Config {
    * @property {boolean} errors - If the job should exit after errors or succeed.
    * @property {string?} liveActivityId - Id of live activity to update/end.
    * @property {string?} streamKey - Stable stream key for stateless stream actions.
+   * @property {string?} metricKey - Metric key for widget value updates.
    * @property {string[]} channels - Optional channels for send/stream/start actions.
    * @property {string?} payload - Request contents from the provided input.
    * @property {string?} payloadDelimiter - Separator for nested attributes.
@@ -41,7 +41,12 @@ export default class Config {
 
   /**
    * The logger of outputs.
-   * @type {import("@slack/logger").Logger}
+   * @type {{
+   *   debug: (message: string) => void,
+   *   info: (message: string) => void,
+   *   warn: (message: string) => void,
+   *   error: (message: string) => void
+   * }}
    */
   logger;
 
@@ -53,7 +58,7 @@ export default class Config {
    * kept for later use.
    *
    * @constructor
-   * @param {core} core - GitHub Actions core utilities.
+   * @param {typeof import("@actions/core")} core - GitHub Actions core utilities.
    */
   constructor(core) {
     this.core = core;
@@ -64,6 +69,7 @@ export default class Config {
       errors: core.getBooleanInput("errors"),
       liveActivityId: core.getInput("live-activity-id"),
       streamKey: core.getInput("stream-key"),
+      metricKey: core.getInput("metric-key"),
       channels: this.parseChannels(core.getInput("channels")),
       payload: core.getInput("payload"),
       payloadDelimiter: core.getInput("payload-delimiter"),
@@ -81,14 +87,14 @@ export default class Config {
    */
   mask() {
     if (this.inputs.apiKey) {
-      core.debug("Setting the provided API key as a secret variable.");
-      core.setSecret(this.inputs.apiKey);
+      this.core.debug("Setting the provided API key as a secret variable.");
+      this.core.setSecret(this.inputs.apiKey);
     }
   }
 
   /**
    * Confirm the configurations are correct enough to continue.
-   * @param {core} core - GitHub Actions core utilities.
+   * @param {typeof import("@actions/core")} core - GitHub Actions core utilities.
    */
   validate(core) {
     if (!this.inputs.apiKey) {
@@ -110,6 +116,19 @@ export default class Config {
       case ActionType.EndLiveActivityStream:
         if (!this.inputs.streamKey) {
           throw new ActivitySmithError(core, "Missing input! A stream key must be provided.");
+        }
+        break;
+      case ActionType.UpdateMetricValue:
+        if (!this.inputs.metricKey) {
+          throw new ActivitySmithError(core, "Missing input! A metric key must be provided.");
+        }
+        if (!this.inputs.payload && !this.inputs.payloadFilePath) {
+          throw new ActivitySmithError(core, "Missing input! A metric value payload must be provided.");
+        }
+        break;
+      case ActionType.UpdateAppIconBadgeCount:
+        if (!this.inputs.payload && !this.inputs.payloadFilePath) {
+          throw new ActivitySmithError(core, "Missing input! An app icon badge payload must be provided.");
         }
         break;
       default:

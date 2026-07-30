@@ -1,5 +1,3 @@
-import { LogLevel } from "@slack/logger";
-
 /**
  * The Logger class creates a Logger to output debug messages and errors.
  *
@@ -8,7 +6,12 @@ import { LogLevel } from "@slack/logger";
 export default class Logger {
   /**
    * The logger for outputs.
-   * @type {import("@slack/logger").Logger}
+   * @type {{
+   *   debug: (message: string) => void,
+   *   info: (message: string) => void,
+   *   warn: (message: string) => void,
+   *   error: (message: string) => void
+   * }}
    */
   logger;
 
@@ -18,15 +21,10 @@ export default class Logger {
    */
   constructor(core) {
     this.logger = {
-      debug: core.debug,
-      info: core.info,
-      warn: core.warning,
-      error: core.error,
-      getLevel: () => {
-        return core.isDebug() ? LogLevel.DEBUG : LogLevel.INFO;
-      },
-      setLevel: (_level) => {},
-      setName: (_name) => {},
+      debug: (message) => core.debug(message),
+      info: (message) => core.info(message),
+      warn: (message) => core.warning(message),
+      error: (message) => core.error(message),
     };
   }
 }
