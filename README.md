@@ -81,6 +81,7 @@ Activity to mirror the workflow step by step.
 
 ```yaml
 - name: End deployment Live Activity
+  if: ${{ always() && steps.start_activity.outputs.live_activity_id != '' }}
   uses: ActivitySmithHQ/activitysmith-github-action@v1
   with:
     action: end_live_activity
@@ -88,13 +89,19 @@ Activity to mirror the workflow step by step.
     live-activity-id: ${{ steps.start_activity.outputs.live_activity_id }}
     payload: |
       content_state:
-        title: "payments-api deployed"
-        subtitle: "Production healthy"
+        title: "${{ job.status == 'success' && 'payments-api deployed' || 'payments-api deployment failed' }}"
+        subtitle: "${{ job.status == 'success' && 'Production healthy' || 'Check the workflow run' }}"
         type: "segmented_progress"
         number_of_steps: 3
         current_step: 3
         auto_dismiss_seconds: 10
+        color: "${{ job.status == 'success' && 'green' || 'red' }}"
 ```
+
+ActivitySmith operations are informative by default. If ActivitySmith is
+temporarily unavailable or a request is invalid, the action reports
+`ok: false` without interrupting the rest of your workflow. Set `errors: true`
+when an ActivitySmith operation must fail the step.
 
 ### Other lifecycle patterns
 
@@ -403,4 +410,4 @@ Show a number on the ActivitySmith app icon. Send `0` to clear it, and optionall
 - Push notification payloads support optional `media`, `redirection`, and up to 4 `actions`.
 - Live Activity payloads support one optional `action`.
 - `media` can be combined with `redirection`, but not with `actions`.
-- `channels` only applies to `send_push_notification`, `stream_live_activity`, and `start_live_activity`. If your payload already includes `target` or `channels`, the action leaves it unchanged.
+- `channels` only applies to `send_push_notification`, `stream_live_activity`, `start_live_activity`, and `update_app_icon_badge_count`. If your payload already includes `target` or `channels`, the action leaves it unchanged.
