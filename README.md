@@ -382,7 +382,7 @@ Show a number on the ActivitySmith app icon. Send `0` to clear it, and optionall
 - `stream-key` (required for `stream_live_activity` and `end_live_activity_stream`): stable key used to identify the tracked stream
 - `metric-key` (required for `update_metric_value`): widget metric key
 - `channels` (optional): comma-separated channels for `send_push_notification`, `stream_live_activity`, `start_live_activity`, and `update_app_icon_badge_count`
-- `errors` (optional, default `false`): set to `true` to fail the step when the API request fails
+- `errors` (optional, default `false`): ActivitySmith failures set `ok: false` without failing the workflow. Set this to `true` only when an ActivitySmith failure should fail the step.
 - `payload-delimiter` (optional): advanced override for nested payload flattening
 
 ## Outputs

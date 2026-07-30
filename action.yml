@@ -10,7 +10,7 @@ inputs:
     description: "The authentication value used with the ActivitySmith API."
     required: true
   errors:
-    description: "If the step exits with an error on errors or continues."
+    description: "Set true to fail the step when ActivitySmith cannot complete the operation. The default false reports ok=false and lets the workflow continue."
     required: false
     default: "false"
   live-activity-id:
