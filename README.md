@@ -1,413 +1,91 @@
-# ActivitySmith GitHub Action
+# activitysmith-github-action
 
-The official ActivitySmith GitHub Action. Send [Push Notifications](#push-notifications) with optional rich media, and drive [Live Activities](#live-activities) with full lifecycle control or stream updates directly from your workflows.
+[![Built with Ona](https://ona.com/build-with-ona.svg)](https://app.ona.com/#https://github.com/Interested-Deving-1896/activitysmith-github-action) [![KDE Eco](https://img.shields.io/badge/KDE%20Eco-certified-brightgreen?logo=kde&logoColor=white&style=flat-square)](https://eco.kde.org/) [![Blue Angel](https://img.shields.io/badge/Blue%20Angel-DE--UZ%20215-0055a4?style=flat-square)](https://www.blauer-engel.de/en/certification/criteria) [![Energy](https://api.green-coding.io/v1/ci/badge/get?repo=Interested-Deving-1896%2Factivitysmith-github-action&branch=main&workflow=eco-audit.yml)](https://metrics.green-coding.io/ci-index.html)
 
-## Live Activities
 
-<p align="center">
-  <img src="https://cdn.activitysmith.com/features/update-live-activity.png" alt="Deployment Live Activity" width="680" />
-</p>
+<!-- AI:start:what-it-does -->
+_Description pending._
+<!-- AI:end:what-it-does -->
 
-GitHub Actions is a natural fit for full lifecycle control. A workflow has a
-clear start, middle, and end, and step outputs make it easy to pass
-`live_activity_id` from one step to the next. For most GitHub workflows, this
-is the best way to drive Live Activities.
+## Architecture
 
-Use stream actions when the same Live Activity should be updated across
-scheduled runs, separate workflows, or other stateless automation where you do
-not want to store `live_activity_id` yourself.
+<!-- AI:start:architecture -->
+_Architecture documentation pending._
+<!-- AI:end:architecture -->
 
-Live Activity UI types:
+## Install
 
-- `segmented_progress`: best for step-based workflows like deployments, backups, and ETL pipelines
-- `progress`: best for continuous jobs like uploads, reindexes, and long-running migrations tracked as a percentage
-- `metrics`: best for live operational stats like server CPU and memory, queue depth, or replica lag
-- `stats`: best for a compact grid of business or operational values
-- `alert`: best for an important state with a message and optional actions
-- `timer`: best for countdowns or elapsed-time tracking
+<!-- Add installation instructions here. This section is yours — the AI will not modify it. -->
 
-### Recommended for GitHub Actions: Full lifecycle control
-
-For deployments, releases, migrations, and other bounded workflows, use the
-explicit lifecycle actions:
-
-1. Run `start_live_activity` when the job starts.
-2. Save the returned `live_activity_id`.
-3. Run `update_live_activity` as the workflow moves forward.
-4. Run `end_live_activity` when the work is finished.
-
-#### Deployment workflow example
-
-Use `segmented_progress` when the work has clear stages and you want the Live
-Activity to mirror the workflow step by step.
-
-#### Start
-
-```yaml
-- name: Start deployment Live Activity
-  id: start_activity
-  uses: ActivitySmithHQ/activitysmith-github-action@v1
-  with:
-    action: start_live_activity
-    api-key: ${{ secrets.ACTIVITYSMITH_API_KEY }}
-    payload: |
-      content_state:
-        title: "Deploying payments-api"
-        subtitle: "Build container image"
-        type: "segmented_progress"
-        number_of_steps: 3
-        current_step: 1
+```bash
+git clone https://github.com/Interested-Deving-1896/activitysmith-github-action.git
+cd activitysmith-github-action
 ```
 
-#### Update
+## Usage
 
-```yaml
-- name: Update deployment Live Activity
-  uses: ActivitySmithHQ/activitysmith-github-action@v1
-  with:
-    action: update_live_activity
-    api-key: ${{ secrets.ACTIVITYSMITH_API_KEY }}
-    live-activity-id: ${{ steps.start_activity.outputs.live_activity_id }}
-    payload: |
-      content_state:
-        title: "Deploying payments-api"
-        subtitle: "Run database migrations"
-        type: "segmented_progress"
-        number_of_steps: 3
-        current_step: 2
+<!-- Add usage examples here. This section is yours — the AI will not modify it. -->
+
+## Configuration
+
+<!-- Document configuration options here. This section is yours — the AI will not modify it. -->
+
+## CI
+
+<!-- AI:start:ci -->
+_CI documentation pending._
+<!-- AI:end:ci -->
+
+## Mirror chain
+
+<!-- AI:start:mirror-chain -->
+This repo is maintained in [`Interested-Deving-1896/activitysmith-github-action`](https://github.com/Interested-Deving-1896/activitysmith-github-action) and mirrored through:
+
+```
+Interested-Deving-1896/activitysmith-github-action  ──►  OpenOS-Project-OSP/activitysmith-github-action  ──►  OpenOS-Project-Ecosystem-OOC/activitysmith-github-action
 ```
 
-#### End
+Changes flow downstream automatically via the hourly mirror chain in
+[`fork-sync-all`](https://github.com/Interested-Deving-1896/fork-sync-all).
+Direct commits to OSP or OOC are detected and opened as PRs back to `Interested-Deving-1896`.
+<!-- AI:end:mirror-chain -->
 
-```yaml
-- name: End deployment Live Activity
-  if: ${{ always() && steps.start_activity.outputs.live_activity_id != '' }}
-  uses: ActivitySmithHQ/activitysmith-github-action@v1
-  with:
-    action: end_live_activity
-    api-key: ${{ secrets.ACTIVITYSMITH_API_KEY }}
-    live-activity-id: ${{ steps.start_activity.outputs.live_activity_id }}
-    payload: |
-      content_state:
-        title: "${{ job.status == 'success' && 'payments-api deployed' || 'payments-api deployment failed' }}"
-        subtitle: "${{ job.status == 'success' && 'Production healthy' || 'Check the workflow run' }}"
-        type: "segmented_progress"
-        number_of_steps: 3
-        current_step: 3
-        auto_dismiss_seconds: 10
-        color: "${{ job.status == 'success' && 'green' || 'red' }}"
-```
+## Contributors
 
-ActivitySmith operations are informative by default. If ActivitySmith is
-temporarily unavailable or a request is invalid, the action reports
-`ok: false` without interrupting the rest of your workflow. Set `errors: true`
-when an ActivitySmith operation must fail the step.
+<!-- AI:start:contributors -->
+_Contributors pending._
+<!-- AI:end:contributors -->
 
-### Other lifecycle patterns
+## Origins
 
-#### Progress example
+<!-- AI:start:origins -->
+_Original project — no upstream influences recorded._
+<!-- AI:end:origins -->
 
-Use `progress` when the state is naturally continuous, such as a long-running
-upload, reindex, or data migration.
+## Resources
 
-```yaml
-- name: Update reindex Live Activity
-  uses: ActivitySmithHQ/activitysmith-github-action@v1
-  with:
-    action: update_live_activity
-    api-key: ${{ secrets.ACTIVITYSMITH_API_KEY }}
-    live-activity-id: ${{ steps.start_activity.outputs.live_activity_id }}
-    payload: |
-      content_state:
-        title: "Reindexing product search"
-        subtitle: "catalog-v2"
-        type: "progress"
-        percentage: 60
-```
+<!-- AI:start:resources -->
+_No additional resource files found._
+<!-- AI:end:resources -->
 
-#### Metrics example
+## Accessibility
 
-Use `metrics` when you want to keep a small set of live stats visible during a
-bounded workflow, such as canary health during a deployment or pressure metrics
-while a migration is running.
+<!-- AI:start:accessibility -->
+This repo uses automated accessibility auditing via `check-accessibility.yml`.
 
-```yaml
-- name: Update canary health Live Activity
-  uses: ActivitySmithHQ/activitysmith-github-action@v1
-  with:
-    action: update_live_activity
-    api-key: ${{ secrets.ACTIVITYSMITH_API_KEY }}
-    live-activity-id: ${{ steps.start_activity.outputs.live_activity_id }}
-    payload: |
-      content_state:
-        title: "Canary Health"
-        subtitle: "payments-api"
-        type: "metrics"
-        metrics:
-          - label: "CPU"
-            value: 31
-            unit: "%"
-          - label: "MEM"
-            value: 58
-            unit: "%"
-```
+Checks include: CODEOWNERS ownership coverage, README screen-reader compatibility,
+WCAG 2.1 AA HTML compliance, audio overview (espeak-ng), and Braille output (liblouis).
 
-### Live Activity Action
 
-Just like Actionable Push Notifications, Live Activities can have a button that
-opens a URL in a browser or triggers a webhook. Webhooks are executed by the
-ActivitySmith backend.
 
-#### Open URL action
 
-<p align="center">
-  <img src="https://cdn.activitysmith.com/features/live-activity-with-action.png?v=20260319-1" alt="Deployment Live Activity with action" width="680" />
-</p>
+Run the [Check Accessibility](https://github.com/Interested-Deving-1896/activitysmith-github-action/actions/workflows/check-accessibility.yml)
+workflow to generate the first report and accessibility artifacts.
+See [DOCS/accessibility.md](https://github.com/Interested-Deving-1896/activitysmith-github-action/blob/main/DOCS/accessibility.md) for the full reference.
+<!-- AI:end:accessibility -->
 
-```yaml
-- name: Start Live Activity with open URL action
-  id: start_activity
-  uses: ActivitySmithHQ/activitysmith-github-action@v1
-  with:
-    action: start_live_activity
-    api-key: ${{ secrets.ACTIVITYSMITH_API_KEY }}
-    payload: |
-      content_state:
-        title: "Deploying payments-api"
-        subtitle: "Running database migrations"
-        type: "segmented_progress"
-        number_of_steps: 5
-        current_step: 3
-      action:
-        title: "Open Workflow"
-        type: "open_url"
-        url: "https://github.com/acme/payments-api/actions/runs/1234567890"
-```
+## License
 
-#### Webhook action
-
-```yaml
-- name: Update Live Activity with webhook action
-  uses: ActivitySmithHQ/activitysmith-github-action@v1
-  with:
-    action: update_live_activity
-    api-key: ${{ secrets.ACTIVITYSMITH_API_KEY }}
-    live-activity-id: ${{ steps.start_activity.outputs.live_activity_id }}
-    payload: |
-      content_state:
-        title: "Reindexing product search"
-        subtitle: "Shard 7 of 12"
-        number_of_steps: 12
-        current_step: 7
-      action:
-        title: "Pause Reindex"
-        type: "webhook"
-        url: "https://ops.example.com/hooks/search/reindex/pause"
-        method: "POST"
-        body:
-          job_id: "reindex-2026-03-19"
-          requested_by: "activitysmith-github-action"
-```
-
-### Use stream when the activity spans multiple runs
-
-Stream actions are still useful in GitHub Actions when the same Live Activity
-should be updated by scheduled workflows, separate workflow runs, or jobs that
-should stay stateless. In that case, send the latest state with a stable
-`stream-key` and ActivitySmith will start or update the Live Activity for you.
-
-#### Scheduled metrics example
-
-<p align="center">
-  <img src="https://cdn.activitysmith.com/features/metrics-live-activity-start.png" alt="Metrics stream example" width="680" />
-</p>
-
-```yaml
-- name: Stream server health
-  id: stream_activity
-  uses: ActivitySmithHQ/activitysmith-github-action@v1
-  with:
-    action: stream_live_activity
-    api-key: ${{ secrets.ACTIVITYSMITH_API_KEY }}
-    stream-key: prod-web-1
-    payload: |
-      content_state:
-        title: "Server Health"
-        subtitle: "prod-web-1"
-        type: "metrics"
-        metrics:
-          - label: "CPU"
-            value: 9
-            unit: "%"
-          - label: "MEM"
-            value: 45
-            unit: "%"
-```
-
-Use `end_live_activity_stream` when the tracked thing is finished and you want
-the Live Activity dismissed. `payload` is optional there. If you later send
-another `stream_live_activity` request with the same `stream-key`,
-ActivitySmith starts a new Live Activity for that stream again.
-
-Stream responses include an `operation` field, also exposed as
-`steps.<id>.outputs.operation`:
-
-- `started`: ActivitySmith started a new Live Activity for this `stream-key`
-- `updated`: ActivitySmith updated the current Live Activity
-- `rotated`: ActivitySmith ended the previous Live Activity and started a new one
-- `noop`: the incoming state matched the current state, so no update was sent
-- `paused`: the stream is paused, so no Live Activity was started or updated
-- `ended`: returned by `end_live_activity_stream` after the stream is ended
-
-## Push Notifications
-
-Push Notifications support three common patterns:
-
-- simple delivery alerts
-- rich media previews
-- actionable follow-up from the notification itself
-
-### Simple Push Notifications
-
-<p align="center">
-  <img src="https://cdn.activitysmith.com/features/deployment-push-notification.png" alt="Deployment push notification" width="680" />
-</p>
-
-```yaml
-- name: Send push notification
-  uses: ActivitySmithHQ/activitysmith-github-action@v1
-  with:
-    action: send_push_notification
-    api-key: ${{ secrets.ACTIVITYSMITH_API_KEY }}
-    payload: |
-      title: "API Deployment"
-      message: "New release deployed to production!"
-```
-
-### Rich Push Notifications with Media
-
-<p align="center">
-  <img src="https://cdn.activitysmith.com/features/rich-push-notification-with-image.png" alt="Rich push notification with image" width="680" />
-</p>
-
-```yaml
-- name: Send rich push notification
-  uses: ActivitySmithHQ/activitysmith-github-action@v1
-  with:
-    action: send_push_notification
-    api-key: ${{ secrets.ACTIVITYSMITH_API_KEY }}
-    payload: |
-      title: "Homepage ready"
-      message: "Your agent finished the redesign."
-      media: "https://cdn.example.com/output/homepage-v2.png"
-      redirection: "https://github.com/acme/web/pull/482"
-```
-
-Send images, videos, or audio with your push notifications, press and hold to preview media directly from the notification, then tap through to open the linked content.
-
-<p align="center">
-  <img src="https://cdn.activitysmith.com/features/rich-push-notification-with-audio.png" alt="Rich push notification with audio" width="680" />
-</p>
-
-What will work:
-
-- direct image URL: `.jpg`, `.png`, `.gif`, etc.
-- direct audio file URL: `.mp3`, `.m4a`, etc.
-- direct video file URL: `.mp4`, `.mov`, etc.
-- URL that responds with a proper media `Content-Type`, even if the path has no extension
-
-`media` can be combined with `redirection`, but not with `actions`.
-
-### Actionable Push Notifications
-
-<p align="center">
-  <img src="https://cdn.activitysmith.com/features/actionable-push-notifications-3.png" alt="Actionable push notification" width="680" />
-</p>
-
-Add redirection when tapping the notification should open a specific URL, and use action buttons when someone should be able to act on the notification immediately. Webhook actions are executed by ActivitySmith backend.
-
-```yaml
-- name: Send actionable push notification
-  uses: ActivitySmithHQ/activitysmith-github-action@v1
-  with:
-    action: send_push_notification
-    api-key: ${{ secrets.ACTIVITYSMITH_API_KEY }}
-    payload: |
-      title: "Build Failed 🚨"
-      message: "CI pipeline failed on main branch"
-      redirection: "https://github.com/org/repo/actions/runs/123456789"
-      actions:
-        - title: "Open Failing Run"
-          type: "open_url"
-          url: "https://github.com/org/repo/actions/runs/123456789"
-        - title: "Create Incident"
-          type: "webhook"
-          url: "https://hooks.example.com/incidents/create"
-          method: "POST"
-          body:
-            service: "payments-api"
-            severity: "high"
-```
-
-## Widget Metrics
-
-Update a metric used by ActivitySmith widgets. `value` can be a number or a string, and `timestamp` is optional.
-
-```yaml
-- name: Update deployment count
-  uses: ActivitySmithHQ/activitysmith-github-action@v1
-  with:
-    action: update_metric_value
-    api-key: ${{ secrets.ACTIVITYSMITH_API_KEY }}
-    metric-key: deployments-today
-    payload: |
-      value: 42
-```
-
-## App Icon Badge Count
-
-Show a number on the ActivitySmith app icon. Send `0` to clear it, and optionally target channels.
-
-```yaml
-- name: Update app icon badge
-  uses: ActivitySmithHQ/activitysmith-github-action@v1
-  with:
-    action: update_app_icon_badge_count
-    api-key: ${{ secrets.ACTIVITYSMITH_API_KEY }}
-    channels: ops
-    payload: |
-      badge: 3
-```
-
-## Inputs
-
-- `action` (required): `send_push_notification`, `stream_live_activity`, `end_live_activity_stream`, `start_live_activity`, `update_live_activity`, `end_live_activity`, `update_metric_value`, or `update_app_icon_badge_count`
-- `api-key` (required): ActivitySmith API key
-- `payload` (required except for `end_live_activity_stream`): inline JSON or YAML payload. The current ActivitySmith API payload is passed through, including notification tags; `stats`, `metrics`, `segmented_progress`, `progress`, `alert`, and `timer` Live Activities; widget metric values; and app icon badge counts.
-- `payload-file-path` (optional): path to a `.json`, `.yml`, or `.yaml` payload file
-- `live-activity-id` (required for `update_live_activity` and `end_live_activity`): Live Activity ID
-- `stream-key` (required for `stream_live_activity` and `end_live_activity_stream`): stable key used to identify the tracked stream
-- `metric-key` (required for `update_metric_value`): widget metric key
-- `channels` (optional): comma-separated channels for `send_push_notification`, `stream_live_activity`, `start_live_activity`, and `update_app_icon_badge_count`
-- `errors` (optional, default `false`): ActivitySmith failures set `ok: false` without failing the workflow. Set this to `true` only when an ActivitySmith failure should fail the step.
-- `payload-delimiter` (optional): advanced override for nested payload flattening
-
-## Outputs
-
-- `ok`: `true` when the request succeeds, otherwise `false`
-- `response`: JSON stringified API response or error response
-- `time`: Unix epoch time (seconds) when the step finished
-- `live_activity_id`: returned when a Live Activity start or stream request returns an activity ID
-- `operation`: returned by stream actions, such as `started`, `updated`, `rotated`, `noop`, `paused`, or `ended`
-
-## Notes
-
-- Use either `payload` or `payload-file-path`.
-- Both inline payloads and payload files can be JSON or YAML.
-- Live Activity payloads go under `content_state` and should use snake_case keys.
-- `live-activity-id` is required for update and end actions.
-- `stream-key` is required for stream start/update and stream end actions.
-- Push notification payloads support optional `media`, `redirection`, and up to 4 `actions`.
-- Live Activity payloads support one optional `action`.
-- `media` can be combined with `redirection`, but not with `actions`.
-- `channels` only applies to `send_push_notification`, `stream_live_activity`, `start_live_activity`, and `update_app_icon_badge_count`. If your payload already includes `target` or `channels`, the action leaves it unchanged.
+<!-- AI:start:license -->
+<!-- License not detected — add a LICENSE file to this repo. -->
+<!-- AI:end:license -->
